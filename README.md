@@ -1,2 +1,2 @@
 # quadrapong
-Quadra Pong Atari 1974
+Quadra Pong [Atari 1974]

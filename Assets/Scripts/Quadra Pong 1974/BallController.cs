@@ -1,10 +1,11 @@
 ﻿
+using System.Collections;
 using UnityEngine;
 
 //
 // Quadra Pong Atari 1974 v2019.02.28
 //
-// v2023.02.12
+// v2023.12.28
 //
 
 public class BallController : MonoBehaviour
@@ -13,23 +14,42 @@ public class BallController : MonoBehaviour
 
     public Transform ballTransform;
 
-    [HideInInspector] public Rigidbody2D ballRigidbody;
-
-    // speed of ball
-    [HideInInspector] public float ballSpeed;
+    public Rigidbody2D ballRigidbody;
 
     // direction of ball
     private float xBallVelocity;
+
     private float yBallVelocity;
 
+    public float xBounceDirection;
+
+    public float yBounceDirection;
+
     // ball bounce speed
-    [HideInInspector] public float ballBounceSpeed;
+    //public float ballBounceSpeed;
+    
+    // speed of ball
+    public float ballSpeed;
 
     // ball speed increase
-    [HideInInspector] public float ballSpeedIncrease;
+    public float ballSpeedIncrease;
 
     // maximum ball speed
-    [HideInInspector] public float maxBallSpeed;
+    public float maxBallSpeed;
+
+    // number of times ball hits the paddle
+    public int ballHitCounter;
+
+    // ball starting position
+    private float ballStartPositionX;
+
+    private float ballStartPositionY;
+
+    //private float paddleLength;
+
+    private float paddleCenter;
+
+    private float ballServeDelay;
 
 
     private void Awake()
@@ -41,32 +61,43 @@ public class BallController : MonoBehaviour
     public void Initialise()
     {
         // set reference to ball's rigidbody component
-        ballRigidbody = ballTransform.GetComponent<Rigidbody2D>();
+        //ballRigidbody = ballTransform.GetComponent<Rigidbody2D>();
 
         // ball speed
-        ballSpeed = 5f;
+        ballSpeed = 2.5f; //5f;
 
         // ball bounce speed
-        ballBounceSpeed = 2f;
+        //ballBounceSpeed = 2f;
 
         // ball speed increase
-        ballSpeedIncrease = 1.1f;
+        ballSpeedIncrease = 0.1f; //1.1f;
 
         // maximum ball speed
-        maxBallSpeed = 12f;
+        maxBallSpeed = 5f; //12f;
 
-        ballTransform.gameObject.SetActive(true);
+        // number of times ball hits the paddle
+        ballHitCounter = 0;
 
-        ballTransform.position = new Vector3(0, 0, 0);
+        ballStartPositionX = 0f;
+
+        ballStartPositionY = 0f;
+
+        // delays the ball before serving
+        ballServeDelay = 3f;
+
+        //ballTransform.gameObject.SetActive(true);
+
+        //ballTransform.position = new Vector3(0, 0, 0);
 
         // randomise player serve
-        ballRigidbody.velocity = new Vector2(RandomServe(ballSpeed), RandomDirection(ballSpeed));
+        //ballRigidbody.velocity = new Vector2(RandomServe(ballSpeed), RandomDirection(ballSpeed));
 
-        CheckGameState();
+        //CheckGameState();
+        StartBall(ballSpeed, ballSpeed);
     }
 
 
-    private void CheckGameState()
+    /*private void CheckGameState()
     {
         if (GameController.gameController.inAttractMode)
         {
@@ -74,20 +105,50 @@ public class BallController : MonoBehaviour
 
             ballRigidbody.velocity = new Vector2(RandomServe(ballSpeed), yBallVelocity);
         }
+    }*/
+
+
+    // start moving the ball
+    public void StartBall(float xBallSpeed, float yBallSpeed)
+    {
+        // randomise player serve
+        float randomServeDirection = RandomServe(xBallSpeed);
+
+        float randomBallDirection = RandomDirection(yBallSpeed);
+
+        // activate the ball
+        ballTransform.gameObject.SetActive(true);
+
+        ballRigidbody.velocity = new Vector2(randomServeDirection, randomBallDirection) * (ballSpeed + ballSpeedIncrease * ballHitCounter);
     }
 
 
     // reset ball
     public void ResetBall(float xVelocity, float yVelocity)
     {
+        // reset ball hit counter
+        ballHitCounter = 0;
+
         // reset ball position
-        ballTransform.position = new Vector3(0, 0, 0);
+        //ballTransform.position = new Vector3(0, 0, 0);
+        ballTransform.position = new Vector2(ballStartPositionX, ballStartPositionY);
 
-        ballTransform.gameObject.SetActive(true);
+        //ballTransform.gameObject.SetActive(true);
 
-        ballRigidbody.velocity = new Vector2(RandomServe(xVelocity), RandomDirection(yVelocity));
+        //ballRigidbody.velocity = new Vector2(RandomServe(xVelocity), RandomDirection(yVelocity));
 
-        CheckGameState();
+        //CheckGameState();
+    
+        // start moving the ball after short delay
+        StartCoroutine(DelayBallServe(xVelocity, yVelocity));
+    }
+
+
+    private IEnumerator DelayBallServe(float ballSpeedX, float ballSpeedY)
+    {
+        yield return new WaitForSeconds(ballServeDelay);
+
+        StartBall(ballSpeedX, ballSpeedY);
     }
 
 
@@ -111,6 +172,34 @@ public class BallController : MonoBehaviour
     }
 
 
+    // change angle of ball when bouncing off paddle
+    public void PaddleBounce(Transform paddleTransform)
+    {
+        // increase ball hit counter
+        ballHitCounter++;
+
+        // determine which direction the ball should bounce
+        if (ballTransform.position.x > GameController.CENTRE_COURT)
+        {
+            xBounceDirection = -ballSpeed;
+        }
+
+        else
+        {
+            xBounceDirection = ballSpeed;
+        }
+
+        // calculate bounce angle
+        paddleCenter = paddleTransform.position.y;
+
+        yBounceDirection = (ballTransform.position.y - paddleCenter) * Player1Controller.player1.paddleLength;
+
+        // change angle and speed of ball
+        ballRigidbody.velocity = new Vector2(xBounceDirection, yBounceDirection) * (ballSpeed + ballSpeedIncrease * ballHitCounter);
+    }
+
+
+    // determines the serve direction of the ball
     private float RandomServe(float ballSpeed)
     {
         float playerServe;
@@ -155,6 +244,7 @@ public class BallController : MonoBehaviour
     }
 
 
+    // determines if the ball should move up or down
     private float RandomDirection(float yVelocity)
     {
         float ballDirection;

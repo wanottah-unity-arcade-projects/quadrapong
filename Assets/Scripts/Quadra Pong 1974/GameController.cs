@@ -5,7 +5,7 @@ using UnityEngine;
 //
 // Quadra Pong Atari 1974 v2019.02.28
 //
-// v2023.02.12
+// v2023.12.29
 //
 
 public class GameController : MonoBehaviour
@@ -17,15 +17,21 @@ public class GameController : MonoBehaviour
     public const float LOWER_BOUNDARY = -6.25f;
     public const float LEFT_BOUNDARY = -6.25f;
     public const float RIGHT_BOUNDARY = 6.25f;
-
+  
+    public const float CENTRE_COURT = 0f;
+   
     //private const float START_DELAY = 1f;
     private const float RESTART_DELAY = 5f;
 
     // direction of paddle
     public const int STOPPED = 0;
+
     public const int UP = 1;
+
     public const int DOWN = -1;
+
     public const int LEFT = -1;
+
     public const int RIGHT = 1;
 
     // reference to text components
@@ -36,13 +42,16 @@ public class GameController : MonoBehaviour
     //public Text pressStartText;
 
     // variables for player's scores
-    [HideInInspector] public int player1Score;
-    [HideInInspector] public int player2Score;
-    [HideInInspector] public int player3Score;
-    [HideInInspector] public int player4Score;
+    public int player1Score;
+
+    public int player2Score;
+
+    public int player3Score;
+
+    public int player4Score;
 
     // game credits
-    [HideInInspector] public int gameCredits;
+    public int gameCredits;
 
     // player difficulty settings
     //private float leftDifficultyASpriteWidth;
@@ -143,13 +152,19 @@ public class GameController : MonoBehaviour
         BallController.ballController.ballTransform.gameObject.SetActive(!gameObjectIsActive);
 
         Player1Controller.player1.paddleTransform.gameObject.SetActive(!gameObjectIsActive);
+        
         Player2Controller.player2.paddleTransform.gameObject.SetActive(!gameObjectIsActive);
+
         Player3Controller.player3.paddleTransform.gameObject.SetActive(!gameObjectIsActive);
+
         Player4Controller.player4.paddleTransform.gameObject.SetActive(!gameObjectIsActive);
 
         Player1Controller.player1.goalTransform.gameObject.SetActive(gameObjectIsActive);
+
         Player2Controller.player2.goalTransform.gameObject.SetActive(gameObjectIsActive);
+
         Player3Controller.player3.goalTransform.gameObject.SetActive(gameObjectIsActive);
+
         Player4Controller.player4.goalTransform.gameObject.SetActive(gameObjectIsActive);
     }
 

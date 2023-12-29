@@ -4,7 +4,7 @@ using UnityEngine;
 //
 // Quadra Pong Atari 1972 v2019.02.28
 //
-// v2022.11.14
+// v2023.12.28
 //
 
 public class CollisionController : MonoBehaviour
@@ -14,10 +14,14 @@ public class CollisionController : MonoBehaviour
     {
         if (!GameController.gameController.inAttractMode)
         {
+            // disable the ball
+            BallController.ballController.ballTransform.gameObject.SetActive(false);
+
             // play the 'goalScored' sound
             AudioController.audioController.PlayAudioClip("Goal Scored");
         }
 
+        // player 1 goal
         if (collidingObject.CompareTag("Player 1 Goal"))
         {
             GameController.gameController.UpdateScore(GameController.PLAYER_ONE);
@@ -25,6 +29,7 @@ public class CollisionController : MonoBehaviour
             BallController.ballController.ResetBall(-BallController.ballController.ballSpeed, -BallController.ballController.ballSpeed);
         }
 
+        // player 2 goal
         if (collidingObject.CompareTag("Player 2 Goal"))
         {
             GameController.gameController.UpdateScore(GameController.PLAYER_TWO);
@@ -32,6 +37,7 @@ public class CollisionController : MonoBehaviour
             BallController.ballController.ResetBall(BallController.ballController.ballSpeed, BallController.ballController.ballSpeed);
         }
 
+        // player 3 goal
         if (collidingObject.CompareTag("Player 3 Goal"))
         {
             GameController.gameController.UpdateScore(GameController.PLAYER_THREE);
@@ -39,6 +45,7 @@ public class CollisionController : MonoBehaviour
             BallController.ballController.ResetBall(BallController.ballController.ballSpeed, BallController.ballController.ballSpeed);
         }
 
+        // player 4 goal
         if (collidingObject.CompareTag("Player 4 Goal"))
         {
             GameController.gameController.UpdateScore(GameController.PLAYER_FOUR);
@@ -60,13 +67,15 @@ public class CollisionController : MonoBehaviour
             {
                 // play a sound
                 AudioController.audioController.PlayAudioClip("Paddle Bounce");
+
+                BallController.ballController.PaddleBounce(collidingObject.transform);
             }
         }
     }
 
 
     // if ball has collided with the paddle
-    private void OnCollisionExit2D(Collision2D collidingObject)
+    /*private void OnCollisionExit2D(Collision2D collidingObject)
     {
         if (collidingObject.gameObject.CompareTag("Player 1"))
         {
@@ -122,6 +131,6 @@ public class CollisionController : MonoBehaviour
                         Player2Controller.player2.paddleDirection * BallController.ballController.ballBounceSpeed);
             }
         }
-    }
+    }*/
 
 } // end of class

@@ -2,9 +2,9 @@
 using UnityEngine;
 
 //
-// Quadra Pong Atari 1974 v2021.04.13
+// Quadra Pong Atari 1974 v2019.02.28
 //
-// v2019.02.28
+// v2023.12.29
 //
 
 
@@ -16,18 +16,27 @@ public class Player1Controller : MonoBehaviour
 
     public Transform goalTransform;
 
+    public Rigidbody2D paddleRigidbody;
+
     // speed of paddle
-    [HideInInspector] public float paddleSpeed;
-    [HideInInspector] public float paddleDirection;
+    public float paddleSpeed;
+
+    public float paddleLength;
+
+    //public float paddleDirection;
+    public Vector2 paddleDirection;
 
     // player start position
     private float paddlePositionX;
+
     private float paddlePositionY;
+
+    private float paddlePositionOffset;
 
     private Vector2 paddleStartPosition;
 
     // ai check
-    [HideInInspector] public bool player1IsComputer;
+    public bool player1IsComputer;
 
 
     private void Awake()
@@ -42,21 +51,35 @@ public class Player1Controller : MonoBehaviour
     }
 
 
+    private void FixedUpdate()
+    {
+        paddleRigidbody.velocity = paddleDirection * paddleSpeed;
+    }
+
 
     public void Initialise()
     {
-        if (GameController.gameController.inAttractMode || player1IsComputer)
+        //if (GameController.gameController.inAttractMode || player1IsComputer)
+        if (player1IsComputer)
         {
-            paddleSpeed = 5f;
+            //paddleSpeed = 5f;
+            paddleSpeed = 7f;
         }
 
         else
         {
-            paddleSpeed = 6f;
+            //paddleSpeed = 6f;
+            paddleSpeed = 10f;
         }
 
-        paddlePositionX = -6f;
+        //paddlePositionX = -6f;
+        paddlePositionX = -7.33f;
+
         paddlePositionY = 0f;
+
+        paddlePositionOffset = 0.5f;
+
+        paddleLength = 3f;
 
         paddleStartPosition = new Vector2(paddlePositionX, paddlePositionY);
 
@@ -94,40 +117,48 @@ public class Player1Controller : MonoBehaviour
     // player 1
     private void KeyboardController()
     {
-        paddleDirection = GameController.STOPPED;
-
-        if (Input.GetKey(KeyCode.W))
+        //paddleDirection = GameController.STOPPED;
+        
+        if (Input.GetKey(KeyCode.Q))
         {
-            paddleDirection = GameController.UP;
+            //paddleDirection = GameController.UP;
 
             MoveUp();
         }
 
 
-        if (Input.GetKey(KeyCode.S))
+        else if (Input.GetKey(KeyCode.A))
         {
-            paddleDirection = GameController.DOWN;
+            //paddleDirection = GameController.DOWN;
 
             MoveDown();
+        }
+
+        else
+        {
+            paddleDirection = new Vector2(paddlePositionX, GameController.STOPPED);
         }
     }
 
 
     private void ComputerController()
     {
-        paddleDirection = GameController.STOPPED;
+        //paddleDirection = GameController.STOPPED;
+        paddleDirection = new Vector2(paddlePositionX, GameController.STOPPED);
 
-        if (paddleTransform.position.y < BallController.ballController.ballTransform.position.y)
+        //if (paddleTransform.position.y < BallController.ballController.ballTransform.position.y)
+        if (BallController.ballController.ballTransform.position.y > paddleTransform.position.y + paddlePositionOffset)
         {
-            paddleDirection = GameController.UP;
+            //paddleDirection = GameController.UP;
 
             MoveUp();
         }
 
 
-        if (paddleTransform.position.y > BallController.ballController.ballTransform.position.y)
+        //if (paddleTransform.position.y > BallController.ballController.ballTransform.position.y)
+        else if (BallController.ballController.ballTransform.position.y < paddleTransform.position.y - paddlePositionOffset)
         {
-            paddleDirection = GameController.DOWN;
+            //paddleDirection = GameController.DOWN;
 
             MoveDown();
         }
@@ -136,7 +167,7 @@ public class Player1Controller : MonoBehaviour
 
     private void MoveUp()
     {
-        if (paddleTransform.position.y < GameController.UPPER_BOUNDARY)
+        /*if (paddleTransform.position.y < GameController.UPPER_BOUNDARY)
         {
             if (player1IsComputer)
             {
@@ -152,13 +183,15 @@ public class Player1Controller : MonoBehaviour
                 paddleTransform.position = 
                     new Vector3(paddleTransform.position.x, paddleTransform.position.y + paddleSpeed * Time.deltaTime, paddleTransform.position.z);
             }
-        }
+        }*/
+
+        paddleDirection = new Vector2(paddlePositionX, GameController.UP);
     }
 
 
     private void MoveDown()
     {
-        if (paddleTransform.position.y > GameController.LOWER_BOUNDARY)
+        /*if (paddleTransform.position.y > GameController.LOWER_BOUNDARY)
         {
             if (player1IsComputer)
             {
@@ -174,7 +207,9 @@ public class Player1Controller : MonoBehaviour
                 paddleTransform.position = 
                     new Vector3(paddleTransform.position.x, paddleTransform.position.y - paddleSpeed * Time.deltaTime, paddleTransform.position.z);
             }
-        }
+        }*/
+
+        paddleDirection = new Vector2(paddlePositionX, GameController.DOWN);
     }
 
 
